@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% load wagtailcore_tags %}
+
+{% block body_class %}template-notepage{% endblock %}
+
+{% block content %}
+
+    <p>project templates</p> 
+
+    <h1>{{ page.title }}</h1>
+    <p class="meta">{{ page.date }}</p>
+
+    <div class="intro">{{ page.intro }}</div>
+
+    {{ page.body|richtext }}
+
+    <p><a href="{{ page.get_parent.url }}">Return to note</a></p>
+
+{% endblock %}
