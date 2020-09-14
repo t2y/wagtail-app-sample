@@ -2,58 +2,68 @@ from django.db import models
 
 from wagtail.admin.edit_handlers import FieldPanel
 from wagtail.core.fields import RichTextField
-from wagtail.core.models import GroupPagePermission
 from wagtail.core.models import Page
+from wagtail.core.models import PagePermissionTester
 from wagtail.core.models import UserPagePermissionsProxy
 from wagtail.search import index
 
 
-class NotePagePermissionTester:
-
-    def __init__(self, user_perms, page):
-        self.user = user_perms.user
-        self.user_perms = user_perms
-        self.page = page
-        self.page_is_root = page.depth == 1  # Equivalent to page.is_root()
-
-        if self.user.is_active and not self.user.is_superuser:
-            self.permissions = set(
-                perm.permission_type for perm in user_perms.permissions
-                if self.page.path.startswith(perm.page.path)
-            )
-
-    def user_has_lock(self):
-        return self.page.locked_by_id == self.user.pk
-
-    def page_locked(self):
+def is_page_owner(page, user):
+    if not user.is_active:
         return False
-
-    def can_publish(self):
+    if user.is_superuser:
         return True
+    return page.owner.pk == user.pk
+
+
+class NotePagePermissionTester(PagePermissionTester):
 
     def can_edit(self):
         print('called can_edit')
-        return self.user.id == self.page.owner.id
+        return is_page_owner(self.page, self.user)
 
     def can_delete(self, ignore_bulk=False):
         print('called can_delete')
-        return False
+        return is_page_owner(self.page, self.user)
 
-    def can_add_subpage(self):
-        print('called can_add_subpage')
-        return False
+    def can_unpublish(self):
+        print('called can_unpublish')
+        return is_page_owner(self.page, self.user)
+
+    def can_publish(self):
+        print('called can_publish')
+        return is_page_owner(self.page, self.user)
+
+    def can_lock(self):
+        print('called can_lock')
+        return is_page_owner(self.page, self.user)
+
+    def can_unlock(self):
+        print('called can_unlock')
+        return is_page_owner(self.page, self.user)
+
+    def can_move(self):
+        print('called can_move')
+        return is_page_owner(self.page, self.user)
+
+    def can_copy(self):
+        print('called can_copy')
+        return is_page_owner(self.page, self.user)
 
     def can_move_to(self, destination):
-        print(f'called can_move_to: {destination}')
+        print(f'called can_move_to: {destination=}')
         return False
+
+    def can_copy_to(self, destination, recursive=False):
+        print(f'called can_copy_to: {destination=}, {recursive=}')
+        return False
+
+    def can_view_revisions(self):
+        print('called can_view_revisions')
+        return is_page_owner(self.page, self.user)
 
 
 class NoteUserPagePermissionsProxy(UserPagePermissionsProxy):
-
-    def __init__(self, user):
-        self.user = user
-        if user.is_active and not user.is_superuser:
-            self.permissions = []
 
     def for_page(self, page):
         return NotePagePermissionTester(self, page)
