@@ -6,6 +6,9 @@ from wagtail.core.fields import RichTextField
 from wagtail.core.models import Page
 from wagtail.search import index
 
+from wagtailmarkdown.fields import MarkdownField
+
+
 class BlogIndexPage(Page):
     intro = RichTextField(blank=True)
 
@@ -17,8 +20,7 @@ class BlogIndexPage(Page):
 class BlogPage(Page):
     date = models.DateField("Post date")
     intro = models.CharField(max_length=250)
-    body = RichTextField(blank=True)
-
+    body = MarkdownField()
     search_fields = Page.search_fields + [
         index.SearchField('intro'),
         index.SearchField('body'),

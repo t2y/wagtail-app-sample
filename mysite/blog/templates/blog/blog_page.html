@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/pygments-style.css' %}">
+{% endblock extra_css %}
+
 {% load wagtailcore_tags %}
+{% load wagtailmarkdown %}
 
 {% block body_class %}template-blogpage{% endblock %}
 
@@ -10,7 +17,9 @@
 
     <div class="intro">{{ page.intro }}</div>
 
-    {{ page.body|richtext }}
+    <article>
+    {{ self.body|markdown }}
+    </article>
 
     <p><a href="{{ page.get_parent.url }}">Return to blog</a></p>
 

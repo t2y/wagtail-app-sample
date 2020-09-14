@@ -28,6 +28,8 @@ INSTALLED_APPS = [
     'search',
     'blog',
 
+    'wagtailmarkdown',
+
     'rest_framework',
     'wagtail.api.v2',
 
