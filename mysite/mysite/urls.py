@@ -10,13 +10,19 @@ from wagtail.documents import urls as wagtaildocs_urls
 from search import views as search_views
 
 from .api import api_router
+from .admin.views.pages import listing as admin_listing
+
 
 urlpatterns = [
     path('api/v2/', api_router.urls),
 
     url(r'^django-admin/', admin.site.urls),
 
+    # Override admin pages view
+    path('admin/pages/', admin_listing.index, name='wagtailadmin_explore_root'),
+    path('admin/pages/<int:parent_page_id>/', admin_listing.index, name='wagtailadmin_explore'),
     url(r'^admin/', include(wagtailadmin_urls)),
+
     url(r'^documents/', include(wagtaildocs_urls)),
 
     url(r'^search/$', search_views.search, name='search'),

@@ -13,6 +13,8 @@ def is_page_owner(page, user):
         return False
     if user.is_superuser:
         return True
+    if page.owner is None:
+        return True
     return page.owner.pk == user.pk
 
 
