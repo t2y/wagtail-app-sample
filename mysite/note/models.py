@@ -107,3 +107,5 @@ class NotePage(AbstractNotePage):
         FieldPanel('intro'),
         FieldPanel('body', classname="full"),
     ]
+
+    subpage_types = []  # prevent child page
