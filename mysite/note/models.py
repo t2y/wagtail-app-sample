@@ -3,9 +3,13 @@ from django.db import models
 from wagtail.admin.edit_handlers import FieldPanel
 from wagtail.core.fields import RichTextField
 from wagtail.core.models import Page
+from wagtail.core.models import PageManager
 from wagtail.core.models import PagePermissionTester
+from wagtail.core.models import BasePageManager
+from wagtail.core.models import PageQuerySet
 from wagtail.core.models import UserPagePermissionsProxy
 from wagtail.search import index
+from wagtail.search.queryset import SearchableQuerySetMixin
 
 
 def is_page_owner(page, user):
@@ -71,7 +75,22 @@ class NoteUserPagePermissionsProxy(UserPagePermissionsProxy):
         return NotePagePermissionTester(self, page)
 
 
+class NotePageQuerySet(PageQuerySet):
+
+    def custom_search(self, query, fields=None, operator=None,
+                      order_by_relevance=True, partial_match=True,
+                      backend='default'):
+        print(f'called custom_search: {query}')
+        return self.search(query, fields, operator, order_by_relevance,
+                partial_match, backend)
+
+
+NotePageManager = PageManager.from_queryset(NotePageQuerySet)
+
+
 class AbstractNotePage(Page):
+
+    objects = NotePageManager()
 
     class Meta:
         abstract = True

@@ -7,17 +7,23 @@ from django.views.decorators.vary import vary_on_headers
 
 from wagtail.admin.auth import user_has_any_page_permission, user_passes_test
 from wagtail.admin.forms.search import SearchForm
-from wagtail.core.models import Page
 from wagtail.search.query import MATCH_ALL
 from wagtail.search.utils import parse_query_string
+
+from note.models import NotePage
 
 
 @vary_on_headers('X-Requested-With')
 @user_passes_test(user_has_any_page_permission)
 def search(request):
-    pages = all_pages = Page.objects.all().prefetch_related('content_type').specific()
+    pages = all_pages = NotePage.objects.all().prefetch_related('content_type').specific()
     if not request.user.is_superuser:
-        pages = pages.filter(owner=request.user.pk)
+        # filter pages with owner
+        pages = all_pages = pages.filter(owner=request.user.pk)
+
+    # filter pages with content type only if Page.objects.all() is used
+    # note_page = ContentType.objects.get_for_model(NotePage)
+    # pages = all_pages = pages.filter(content_type_id=note_page.pk)
 
     q = MATCH_ALL
     content_types = []
@@ -77,8 +83,8 @@ def search(request):
                 pages = pages.filter(live=False)
 
             # Search
-            all_pages = all_pages.search(query, order_by_relevance=not ordering)
-            pages = pages.search(query, order_by_relevance=not ordering)
+            all_pages = all_pages.custom_search(query, order_by_relevance=not ordering)
+            pages = pages.custom_search(query, order_by_relevance=not ordering)
 
             # Facets
             if pages.supports_facet:

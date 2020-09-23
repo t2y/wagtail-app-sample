@@ -22,7 +22,7 @@ class Command(BaseCommand):
         if q.exists():
             self.stdout.write(f'exists: {repr(q.get())}')
             return
-    
+
         User = get_user_model()
         owner = User.objects.filter(is_superuser=True).first()
         note_index = NoteIndexPage(title=options['title'], owner=owner)
