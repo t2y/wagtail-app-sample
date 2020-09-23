@@ -10,8 +10,9 @@ from wagtail.documents import urls as wagtaildocs_urls
 from search import views as search_views
 
 from .api import api_router
-from .admin.views.pages import listing as admin_listing
 from .admin.views.pages import history as admin_history
+from .admin.views.pages import listing as admin_listing
+from .admin.views.pages import search
 
 
 urlpatterns = [
@@ -23,6 +24,7 @@ urlpatterns = [
     path('admin/pages/', admin_listing.index, name='wagtailadmin_explore_root'),
     path('admin/pages/<int:parent_page_id>/', admin_listing.index, name='wagtailadmin_explore'),
     path('admin/pages/<int:page_id>/history/', admin_history.PageHistoryView.as_view(), name='history'),
+    path('admin/pages/search/', search.search, name='search'),
     url(r'^admin/', include(wagtailadmin_urls)),
 
     url(r'^documents/', include(wagtaildocs_urls)),
