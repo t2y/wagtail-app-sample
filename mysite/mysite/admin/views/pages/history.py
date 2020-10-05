@@ -1,10 +1,10 @@
 from django.http import Http404
-from wagtail.admin.views.pages import history
+from wagtail.admin.views.pages import PageHistoryView
 
 from note.models import is_page_owner
 
 
-class PageHistoryView(history.PageHistoryView):
+class PageHistoryView(PageHistoryView):
 
     def get_context_data(self, *args, object_list=None, **kwargs):
         if is_page_owner(self.page, self.request.user):
